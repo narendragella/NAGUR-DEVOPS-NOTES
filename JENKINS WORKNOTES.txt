@@ -1,0 +1,191 @@
+JENKINS
+-------------------------------------------------------------------------------------------------------------
+JENKINS FREESTYLE CONFIGURATION
+Git → Build → Deploy to Tomcat
+What is a Freestyle Job?
+A Freestyle Job is a traditional Jenkins job where we configure steps using the UI instead of writing a Jenkinsfile.
+It is:
+✔ Easy to configure
+✔ UI-based
+✔ Beginner friendly
+❌ Less flexible than Pipeline
+
+2. Prerequisites
+Before creating the job, ensure:
+🔹 Plugins Installed
+Manage Jenkins → Plugins
+Install:
+✅ Git Plugin
+✅ Maven Integration Plugin
+✅ Deploy to Container Plugin
+Tools Configured
+Manage Jenkins → Global Tool Configuration
+Maven
+Name: maven3
+✔ Install automatically
+JDK
+Name: java11
+✔ Install automatically
+🔹 Credentials Added
+Manage Jenkins → Credentials → Global
+Tomcat
+ID: tomcat-creds
+Username: tomcat
+Password: tomcat
+3. Step-by-Step: Create Freestyle Job
+Step 1: Create Job
+Jenkins Dashboard → New Item
+Name: git-build-deploy
+Select: Freestyle Project
+Click: OK
+Step 2: Configure Git (Clone Repo)
+Scroll to:
+🔹 Source Code Management → Git
+Step 3: Configure Build Trigger (Optional)
+For Auto Trigger:
+🔹 Build Triggers
+✔ GitHub hook trigger for GITScm polling
+(If webhook is configured)
+Step 4: Configure Build Step (Maven Build)
+Buildsteps->add build step ->Execute shell->mvn clean install
+Step 5: Configure Deployment to Tomcat
+Post-build Actions-> Add Post-build Action → Deploy war/ear to a container
+WAR/EAR files
+**/*.war
+context path
+give the name that will be present in tomcat console
+Containers
+Select:
+Tomcat 9.x
+credentials-- select the password which we already cofigured previously
+Tomcat URL -- http://ec2-54-83-117-114.compute-1.amazonaws.com:9000/ the url of tomcat
+
+-------------------------------------------------------------------------------------------------------------
+JENKINS PIPELINE CONFIGURATION without webhooks
+sme as freestyle but here is select PIPELINE OPTION.
+Pipeline
+1. pipeline script
+pipeline {
+    agent any
+tools{
+maven "maven3"
+}
+
+    stages {
+        stage('GIT REPO') {
+            steps {
+                echo 'cloning repo'
+				git branch: 'main', url: 'https://github.com/narendragella/mindcircuit16d.git'
+            }
+        }
+		stage('build') {
+            steps {
+                echo 'build the artifact by using mven  tool'
+				sh 'mvn clean install'
+            }
+        }
+		stage('DEPLOY') {
+            steps {
+                echo 'deploying the artifact into tomcat '
+				deploy adapters: [tomcat8(alternativeDeploymentContext: '', credentialsId: '6df2cd21-561a-4c27-98d1-973cb47362d2', path: '', url: 'http://ec2-54-83-117-114.compute-1.amazonaws.com:9000/')], contextPath: 'tomcat2', war: '**/*.war'
+            }
+        }
+    }
+}
+save  it.
+
+2. pipeline scriptfrom SCM
+SCM->GIT
+Repository URL---https://github.com/narendragella/mindcircuit16d.git
+Branch Specifier --main
+Script Path--- it should be Jenkinsfile and we have done the code in that  Jenkinsfile file in git repo.
+
+===================================================================================================================================
+JENKINS BACKUP
+
+📌 1. Why Jenkins Backup is Needed
+Jenkins stores everything in one place called:
+JENKINS_HOME
+Example:
+/var/lib/jenkins
+
+Inside it:
+
+✔ Jobs
+✔ Pipelines
+✔ Credentials
+✔ Plugins
+✔ Configurations
+✔ Build history
+
+📌 2. What to Backup (Most Important)
+Always backup:
+JENKINS_HOME/
+This is enough to restore Jenkins.
+
+📌 3. Where is JENKINS_HOME?
+Check in Jenkins:
+Manage Jenkins → System Information
+Look for: JENKINS_HOME = /var/lib/jenkins
+
+📌 4. Method 1: Manual Backup (Basic Way)
+▶ Stop Jenkins (Recommended)
+sudo systemctl stop jenkins
+▶ Take Backup
+tar -czvf jenkins_backup_$(date +%F).tar.gz /var/lib/jenkins
+Creates:jenkins_backup_2026-02-08.tar.gz
+▶ Start Jenkins
+sudo systemctl start jenkins
+
+📌 5. Method 2: Automated Backup (Cron Job – Best Practice)
+▶ Create Script
+vi /opt/jenkins_backup.sh
+Add:
+#!/bin/bash
+
+BACKUP_DIR="/backup/jenkins"
+DATE=$(date +%F)
+
+mkdir -p $BACKUP_DIR
+
+tar -czf $BACKUP_DIR/jenkins_$DATE.tar.gz /var/lib/jenkins
+
+▶ Make Executable
+chmod +x /opt/jenkins_backup.sh
+▶ Add Cron
+crontab -e
+Add:  0 2 * * * /opt/jenkins_backup.sh
+Runs daily at 2 AM ✅
+
+📌 6. Method 3: Using Backup Plugin (Easy Way)
+▶ Install Plugin
+Manage Jenkins → Plugins → ThinBackup
+▶ Configure
+Manage Jenkins → ThinBacku
+Set:
+Backup directory: /backup/jenkins
+Schedule: Daily
+
+📌 7. Method 4: Cloud / Snapshot Backup (Enterprise Way)
+If Jenkins is on:
+☁ AWS EC2
+Use:
+✔ EBS Snapshot
+☁ VM (VMware/Azure)
+Use:
+✔ VM Snapshot
+Best for disaster recovery.
+
+📌 8. Jenkins Restore (Very Important)
+▶ Restore from Backup
+Step 1: Stop Jenkins
+sudo systemctl stop jenkins
+Step 2: Extract Backup
+tar -xzvf jenkins_backup_2026-02-08.tar.gz -C /
+OR
+cp -r backup/jenkins/* /var/lib/jenkins/
+Step 3: Fix Permissions
+chown -R jenkins:jenkins /var/lib/jenkins
+Step 4: Start Jenkins
+sudo systemctl start jenkins
+Jenkins will be restored ✅
