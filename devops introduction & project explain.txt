@@ -1,0 +1,83 @@
+✅ 2–3 Minute Interview Introduction
+
+“Good morning/Good afternoon. Thank you for giving me this opportunity.
+My name is Nagur Meera Narendra Gella, and I am a DevOps Engineer with over three years of professional experience in building, automating, and managing modern application deployment systems.
+
+I started my career by supporting DevOps operations through ServiceNow, where I handled incident, change, and problem tickets related to deployments, infrastructure issues, and monitoring. This helped me build a strong foundation in troubleshooting, root cause analysis, and production support.
+
+Over time, I moved into core DevOps responsibilities, where I worked extensively on designing and maintaining CI/CD pipelines using Jenkins, Git, and Docker. I have experience in containerizing applications and deploying them on Kubernetes clusters in on-premise environments, supporting rolling updates, scaling, and deployment verification.
+
+I have also worked on Infrastructure as Code using Terraform to provision and manage environments in a standardized and reliable way. For configuration management, I have used Ansible playbooks and roles, with exposure to AWX and dynamic inventory.
+
+In terms of cloud, I have working knowledge of AWS services such as EC2, VPC, IAM, CloudWatch, and S3. I was actively involved in cloud migration activities for testing environments, where I supported deployment validation, monitoring, and basic troubleshooting.
+
+Monitoring and system reliability are very important in my role. I have worked with tools like Prometheus, Grafana, and Dynatrace to create dashboards, configure alerts, and ensure high availability of applications and infrastructure.
+
+Along with this, I have developed Bash and basic Python scripts to automate repetitive operational tasks, which helped reduce manual effort and improve efficiency. I regularly collaborate with development, QA, and operations teams in Agile environments to ensure smooth releases.
+
+Overall, I am passionate about automation, continuous improvement, and building stable and scalable systems. I enjoy learning new technologies and improving my skills.
+
+At this stage of my career, I am looking for an opportunity where I can contribute my DevOps experience, take more ownership of projects, and grow into a more advanced role. I believe this position will allow me to do that, and I am excited about the possibility of contributing to your organization.
+
+Thank you.”
+
+✅ 1. “Explain Your Current Project in Detail”
+Sample Answer (2–3 Minutes)
+
+“In my current role, I am working on an on-premise CI/CD automation and deployment platform that supports multiple applications used by internal and external users.
+
+The main objective of this project is to automate the build, test, and deployment process and ensure reliable application delivery across development, testing, and production environments.
+
+We use Git for source code management and Jenkins for building CI/CD pipelines. Whenever developers push code to Git, the pipeline is triggered using webhooks. The pipeline performs code checkout, build, testing, Docker image creation, and deployment.
+
+We containerize applications using Docker and deploy them to Kubernetes clusters. We manage rolling updates, scaling, and deployment verification using Kubernetes features.
+
+For infrastructure management, we use Terraform to provision servers and related configurations. We follow Infrastructure as Code practices to maintain consistency across environments.
+
+We use Ansible playbooks for configuration management, such as installing packages, configuring services, and setting up application dependencies.
+
+Monitoring is done using Prometheus, Grafana, and Dynatrace. We create dashboards and alerts to monitor CPU, memory, disk usage, and application health.
+
+My responsibilities include maintaining CI/CD pipelines, supporting deployments, troubleshooting issues, monitoring systems, and automating manual tasks using Bash and Python scripts.
+
+This project has helped improve deployment speed, reduce manual effort, and increase system stability.”
+
+
+
+✅ 2. “What Challenges Did You Face?”
+Sample Answer
+
+“One of the main challenges I faced was handling deployment failures in Kubernetes due to configuration issues and resource limitations.
+
+Initially, some deployments were failing because of incorrect resource limits, environment variables, and image version mismatches. This caused application downtime.
+
+To solve this, I analyzed logs, checked pod events, and reviewed YAML configurations. I worked with the development team to standardize configurations and improve version control.
+
+Another challenge was managing pipeline failures in Jenkins due to dependency issues and network problems.
+
+I resolved this by improving error handling in pipelines, adding validation steps, and creating documentation for common issues.
+
+During cloud migration for testing environments, we also faced challenges related to networking and security configurations in AWS.
+
+I learned how to debug VPC, security group, and IAM issues and coordinated with senior engineers to resolve them.
+
+These challenges helped me improve my troubleshooting skills and understand systems more deeply.”
+
+
+
+✅ 3. “Why Are You Changing Your Job?”
+Best Professional Answer (Safe & Honest)
+
+“I am grateful for the experience and learning opportunities in my current organization. It helped me build a strong foundation in DevOps, automation, and infrastructure management.
+
+However, now I feel that I am ready to take on more responsibilities, work on larger-scale projects, and deepen my knowledge in cloud, Kubernetes, and advanced DevOps practices.
+
+In my current role, learning opportunities have become limited, and growth is slower.
+
+I am looking for an organization where I can contribute more, learn new technologies, and grow technically and professionally.
+
+I believe this role aligns well with my skills and career goals.”
+
+
+
+
