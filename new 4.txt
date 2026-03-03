@@ -1,0 +1,96 @@
+Explain your CI/CD pipeline
+Your structure:
+1️⃣ Developer pushes code to Git
+2️⃣ Jenkins triggers build
+3️⃣ Build + test
+4️⃣ Artifact to Nexus
+5️⃣ AWX/ArgoCD deploys
+6️⃣ Validation
+7️⃣ Promote to PROD
+“In our project, developers push code to GitHub. We have webhooks configured, so any code commit automatically triggers Jenkins.
+Jenkins pulls the code and uses Maven to build the application and generate an artifact. That artifact is stored in Nexus with proper versioning
+After the artifact is ready, we update the version in Git and trigger deployment using AWX.
+In AWX, we sync inventory, select the deployment template, choose the environment and target servers, and provide credentials.
+Before deployment, we stop the Tomcat service, deploy the new artifact, and restart the service.
+After deployment, we validate using PDT and basic functional testing.
+Once it is verified in non-production, the same version is promoted to production after CR approval during the maintenance window.”
+“Tell me about your experience”
+Say this:
+“I have 3+ years of experience working in enterprise on-prem and hybrid environments.
+I handle CI/CD using Jenkins, AWX, and ArgoCD, manage Kubernetes clusters, and own production deployments.
+I perform monthly patching for around 140 Linux servers and Kubernetes clusters, handle monitoring using Prometheus, Grafana, and Dynatrace, and manage incidents through ServiceNow.
+I also supported AWS environments with EC2, VPC, ALB, and ASG.
+My role involves end-to-end deployment, validation, and stability of production systems.”
+“Why Should We Hire You?”
+Your answer:
+“You should hire me because I have strong hands-on experience in managing real production systems in enterprise environments.
+I independently handle CI/CD pipelines, deployments, monitoring, patching, and incident resolution. I have managed around 140 Linux servers and Kubernetes clusters and ensured system stability.
+I understand both development and operations workflows, so I can coordinate effectively with developers, QA, and business teams.
+I follow proper release processes, focus on automation, and always prioritize system reliability and security.
+I am a quick learner, adaptable to new projects, and I believe I can contribute to Accenture from day one.”
+
+Never say:
+
+❌ “I don’t know” (directly)
+❌ “I never worked”
+❌ “I forgot”
+
+Instead say:
+
+✅ “I haven’t worked deeply on that, but I understand the concept…”
+✅ “In my project, we followed this approach…”
+
+“Explain your role in your current project.”
+“In my current project, I work as a DevOps Engineer responsible for CI/CD, deployments, monitoring, and production support in an enterprise on-prem environment.
+
+On a daily basis, I start by checking application and infrastructure health using Dynatrace and VTM dashboards. If there are any alerts or performance issues, I analyze and resolve them.
+
+Then I participate in the daily Scrum call and update my task status.
+
+I handle deployment requests from developers and perform deployments across non-production and production environments using Jenkins, AWX, and ArgoCD, followed by post-deployment validation.
+
+For testing environments, I perform daily sanity checks and business flow testing to ensure stability.
+
+I also support developers and QA teams by troubleshooting issues raised through emails and ServiceNow tickets.
+
+In addition, I handle production incidents, perform root cause analysis, restore services, and close incidents within SLA.
+
+I also manage monthly OS and Kubernetes patching for around 140 servers and clusters.
+
+Overall, my role involves automation, monitoring, deployments, troubleshooting, and ensuring system stability.”
+
+Biggest incident you handled
+You actually did:
+
+✅ On-call handling
+✅ Incident ownership
+✅ Replication
+✅ Bridge call
+✅ Log analysis
+✅ Cross-team coordination
+✅ RCA
+✅ Closure
+
+“One major incident I handled was a P2 production issue detected through automated application monitoring. Multiple customers were impacted.
+
+Since I was on-call at that time, I immediately accepted the incident and started investigation. I replicated the user journey and confirmed the issue in the application.
+
+I organized a bridge call with developers and stakeholders and checked service health and application logs. Although the services were running, the logs showed errors related to an external dependency.
+
+I coordinated with the external team on the same call, and they identified and fixed the root cause.
+
+After their fix, the application recovered, and customer impact stopped.
+
+I then collected the RCA, documented the incident, and implemented preventive actions.
+
+The issue was resolved within SLA and without any data loss.”
+
+The issue was resolved within the SLA and without data loss.”
+Always include these 5 things:
+
+1️⃣ Severity (P1 / P2)
+2️⃣ Your role (on-call / owner)
+3️⃣ Action (what YOU did)
+4️⃣ Result (fixed / impact reduced)
+5️⃣ Learning (RCA / prevention)
+
