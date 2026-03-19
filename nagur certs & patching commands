@@ -267,4 +267,317 @@ prod
 create pool, and then virtual server as same as A1(VS-A1_CNGW_COREOUK (HTTP, port 8080))
 
 
+===================================================================================
+mws_optimiszation
+
+MWS Migration to S4 Environment
+Migration of iScore to CNGW
+1. Deploy iScore Properties in CNGW Servers
+Original Properties of CNGW: /opt/properties_bkp_cngw_orgnl
+Original Properties for MWS Optimization: /opt/properties_bkp_mws_optim_changes
+Steps:
+Copy the properties from iScore to CNGW servers.
+Ensure the properties are correctly deployed.
+2. Deploy iScore Components in CNGW Servers
+Components to be Copied:
+coreoukmessages
+corecommonmessages
+certificates to be Copied:
+--> First take the backup of certificates in cngw_servers and copy the certs from iscore_servers
+client.jks
+jsscacerts
+Steps:
+Copy client.jks and jsscacerts from iScore to CNGW servers.
+3. Revert Properties and Restart Tomcat in ISGW Servers
+Properties Name: cmspci.properties
+Original Properties: cmspci.properties_isgw_original
+MWS Optimization Properties: cmspci.properties_mws_optim
+Steps:
+Revert the properties to their original state.
+Restart Tomcat on ISGW servers.
+4. Stop iScore Servers (Tomcat)
+Steps:
+Stop Tomcat on iScore servers and place the sanity
+Ensure iScore does not run (Ansible AWX will restart it daily) or unlink the components of iScore.
+5. Update HAProxy Configuration
+Steps:
+Point HAProxy to CNGW.
+Restart HAProxy.
+6. After the changes and service restarts, please place the sanity
+
+
+
+
+--------------------------------------
+
+C5 changes in VTM
+virtual server
+
+VS-C5_ISCORE_COREOUK (HTTP, port 8091)
+VS-C5_ISCORE_CORECMS (HTTP, port 8090)
+ --> Before the changes the port is 8091 and 8090 as the properties in isgw(vi /etc/hqn/cmspci/cmspci.properties) is changed to 8080. i have changed the VTM port to 8080 frontend 
+
+VS-C5_ISCORE_CORECMS port is changed to 8080 from 8090 
+VS-C5_ISCORE_COREOUK port is changed to 8080 from 8091
+
+
+Before changes:
+# local url for valdiate service
+cmspci.url=http://hqn-services:8080/commonmessagesservice/ws/ValidatePayment
+#remote url for internal CommonMessage Service
+internal.cms.url=http://hqn-services:8090/corecommonmessagesservice/CoreCommonMessagesService
+internal.oukms.url=http://hqn-services:8091/coreoukmessagesservice/CoreOUKMessagesService
+
+
+After changes:
+# local url for valdiate service
+cmspci.url=http://hqn-services:8080/commonmessagesservice/ws/ValidatePayment
+#remote url for internal CommonMessage Service
+internal.cms.url=http://hqn-services:8080/corecommonmessagesservice/CoreCommonMessagesService
+internal.oukms.url=http://hqn-services:8080/coreoukmessagesservice/CoreOUKMessagesService
+
+
+vi /etc/hqn/cmspci/cmspci.properties you will find the above details
+
+VS-C5_ISCORE_COREOUK port is changed to 8080 from 8091
+
+VS-C5_ISCORE_CORECMS (HTTP, port 8090)
+
+
+VS-C5_ISCORE_CORECMS port is changed to 8080 from 8090
+
+--- note: we havent changed.
+
+
+
+-----------------------------------------------
+
+/corecommonmessagesservice
+/coreoukmessagesservice
+need to added both ACls 
+  https://nexusrepo.aws.mobius.nat.bt.com/digital-consumer/repository/APP12393_WLMS2-Product-Management_maven_releases/c5/com/bt/hqn/hqnproperties/NF_ISCORE_DECOM.3/hqnproperties-NF_ISCORE_DECOM.3.zip
+  
+  https://nexusrepo.aws.mobius.nat.bt.com/digital-consumer/repository/APP12393_WLMS2-Product-Management_maven_releases/c3/com/bt/hqn/hqnproperties/NF_ISCORE_DECOM.4/hqnproperties-NF_ISCORE_DECOM.4.zip
+  
+  
+  c3 deployment completed
+  
+  
+  Revreting the changes in C3 MWS_OPT changes
+  
+  removed the components from 
+  https://nexusrepo.aws.mobius.nat.bt.com/digital-consumer/repository/APP12393_WLMS2-Product-Management_maven_releases/c3/com/bt/hqn/hqnproperties/AD220.27/hqnproperties-AD220.27.zip 
+  
+  https://nexusrepo.aws.mobius.nat.bt.com/digital-consumer/repository/APP12393_WLMS2-Product-Management_maven_releases/c3/com/bt/hqn/hqnproperties/NF_ISCORE_DECOM.4/hqnproperties-NF_ISCORE_DECOM.4.zip
+  
+  NF_ISCORE_DECOM.1
+  
+  NF_ISCORE_DECOM.1
+  
+  
+  c3 haproxy changes only. Not changed anything in VTM.
+  
+--------------------------------------------------------------------------------------------------------
+Below are the original ports for the mentioned virtual servers. I have swaped them for kamal ask
+
+VS-C1_ISGW_CNGW
+53050
+
+VS-C3_ISGW_CNGW
+53051
+
+----------------------------------------------------------------------------------
+
+A1 mw changes
+
+061
+mW'8tSnX=r6a7GBc
+
+062
+K89p=t0A%h7UwR<'
+
+065
+<Jklr8IEC3:fx5(b
+
+066
+k7T8lw(XC=ua9)HV
+
+properties bundle build from develop_ISCORE_DECOM
+
+ https://nexusrepo.aws.mobius.nat.bt.com/digital-consumer/repository/APP12393_WLMS2-Product-Management_maven_releases/a1/com/bt/hqn/hqnproperties/NF_ISCORE_DECOM.5/hqnproperties-NF_ISCORE_DECOM.5.zip
+ 
+ A1 only VTM changes
+ 
+ changed iscore_cms and iscore_coreouk backend changes (added the backend servers)
+ 
+ copied the certificates from iscore to cngw server both clientcerts.jks jssecacerts
+ 
+ taken backup of the original files in cngw as clientcerts.jks_orgnl jssecacerts_orgnlname: 
+ 
+ ----------------------------------------------------------------------------------------------
+ virtual server creation in A1 zxtm
+ service->virtualservices->createvirtualservice(this is at bottom)
+ Virtual Server Name: VS-A1_CNGW_COREOUK (HTTP, port 8080)
+ protocol: http
+ port: 8080
+ default traffic pool: 
+ 
+ create a default traffic pool:
+    PL-A1_CNGW_COREOUK
+	
+	
+	
+	
+	-AD222.3
+ 
+ ===========================================================================================================
+mws haproxy changes
+
+# Below frontend http_8091 and http_8090 iscore block commented
+# Due to mws_optimization from iscore to cngw
+
+# below 2 acl's are added for iscore to cngw mws_optimization
+# above 2 are added
+
+
+comment the below lines
+
+backend backend_iscore_61080_corecommon
+    mode            http
+    balance         roundrobin
+    option          httpchk GET /corecommonmessagesservice/
+    server          iscore01 10.13.17.47:61080 check
+    server          iscore02 10.13.17.48:61080 check
+
+backend backend_iscore_61080_coreouk
+    mode            http
+    balance         roundrobin
+    option          httpchk GET /coreoukmessagesservice/
+    server          iscore01 10.13.17.47:61080 check
+    server          iscore02 10.13.17.47:61080 check
+-----------------------------------------------------------------------------------
+comment the below lines in haproxy
+
+frontend http_8091
+    mode            http
+    bind            :8091
+    log             127.0.0.1 local3 info
+    log-format       %f\ %ci\ [%T]\ %{+Q}r\ %ST\ %U\ %Tr
+
+    default_backend backend_iscore_61080_coreouk
+
+frontend http_8090
+    mode            http
+    bind            :8090
+    log             127.0.0.1 local3 info
+    log-format       %f\ %ci\ [%T]\ %{+Q}r\ %ST\ %U\ %Tr
+
+    default_backend backend_iscore_61080_corecommon
+	
+	----------------------------------------------------------------------------
+	frontend http_8080
+    mode            http
+    bind            :8080
+    acl             host_acl_corvus hdr_sub(host) -i hqn-corvus
+    acl             host_acl_stub hdr_sub(host) -i hqn-stub hdr_sub(host) -i stubs
+    acl             acl_intbulk_bpms-support-console path_beg /bpms-support-console
+#   acl             acl_cngw_commoncapabilityservice path_beg /commoncapabilityservice
+#	acl             acl_cngw_corecommonmessagesservice path_beg /corecommonmessagesservice
+#   acl             acl_cngw_coreoukmessagesservice path_beg /coreoukmessagesservice
+    acl             acl_rpt_pfvapp path_beg /pfvapp
+    acl             acl_rpt_pfvserver path_beg /pfvserver
+    acl             acl_rpt_lviapi path_beg /lviapi
+    acl             acl_rpt_lviapp path_beg /lviapp
+    acl             acl_stub_adviceoftransferservice-callback path_beg /adviceoftransferservice-callback-4.2.0.0
+    acl             acl_stub_apiservice path_beg /apiservice
+    acl             acl_stub_assurance-services-web path_beg /assurance-services-web-4.2.0.0
+    acl             acl_stub_BankAccountValidation path_beg /BankAccountValidation
+    acl             acl_stub_convergedchecker-services-web path_beg /convergedchecker-services-web
+    acl             acl_stub_corvus path_beg /corvus
+    acl             acl_stub_cpcieeauth-services-web path_beg /cpcieeauth-services-web-1.0
+    acl             acl_stub_cpci-services-web path_beg /cpci-services-web-1.0
+    acl             acl_stub_customer-services-web path_beg /customer-services-web-4.2.0.0
+    acl             acl_stub_dialogue-services-web path_beg /dialogue-services-web-4.2.0.0
+    acl             acl_stub_eetext-service-web path_beg /eetext-service-web
+    acl             acl_stub_experian-pco-service-web path_beg /experian-pco-service-web
+    acl             acl_stub_exttrigger-web path_beg /exttrigger-web
+	acl             acl_stub_healthreport path_beg /healthreport
+    acl             acl_stub_logon-services-web path_beg /logon-services-web-4.2.0.0
+    acl             acl_stub_mobilesubscription path_beg /mobilesubscription
+    acl             acl_stub_netlynks-services-web path_beg /netlynks-services-web
+    acl             acl_stub_provisioning-services-web path_beg /provisioning-services-web-4.2.0.0
+    acl             acl_stub_serverhealthcheck-web path_beg /serverhealthcheck-web
+    acl             acl_stub_qube-service-web path_beg /qube-service-web
+    acl             acl_stub_gpaacgroupdetail-web path_beg /gpaacgroupdetail-web
+    acl             acl_stub_ngd-services-web path_beg /ngd-services-web
+    acl             acl_stub_providentorder-service-web path_beg /providentorder-service-web
+    acl             acl_stub_baas-ms-web path_beg /bill /payment /contract /etc
+    acl             acl_stub_baas-rbmaccessservice-web path_beg /baas-rbmaccessservice-web
+    use_backend     backend_rpt_61080_lvi if acl_rpt_lviapp
+    use_backend     backend_rpt_61080_lvi if acl_rpt_lviapi
+    use_backend     backend_rpt_61080_pfv if acl_rpt_pfvserver
+    use_backend     backend_rpt_61080_pfv if acl_rpt_pfvapp
+    use_backend     backend_intbulk_61080 if acl_intbulk_bpms-support-console
+#   use_backend     backend_cngw_commoncapability_61080 if acl_cngw_commoncapabilityservice
+#   use_backend     backend_cngw_coreouk_61080 if acl_cngw_coreoukmessagesservice
+#   use_backend     backend_cngw_corecommon_61080 if acl_cngw_corecommonmessagesservice
+    use_backend     backend_corvus_61080 if host_acl_corvus acl_stub_corvus
+    use_backend     backend_stubs_adviceoftransferservice-callback if acl_stub_adviceoftransferservice-callback
+    use_backend     backend_stubs_apiservice if acl_stub_apiservice
+    use_backend     backend_stubs_assurance-services-web if acl_stub_assurance-services-web
+    use_backend     backend_stubs_BankAccountValidation if acl_stub_BankAccountValidation
+	use_backend     backend_stubs_convergedchecker-services-web if acl_stub_convergedchecker-services-web
+    use_backend     backend_stubs_corvus if host_acl_stub acl_stub_corvus
+    use_backend     backend_stubs_cpcieeauth-services-web if acl_stub_cpcieeauth-services-web
+    use_backend     backend_stubs_cpci-services-web if acl_stub_cpci-services-web
+    use_backend     backend_stubs_customer-services-web if acl_stub_customer-services-web
+    use_backend     backend_stubs_dialogue-services-web if acl_stub_dialogue-services-web
+    use_backend     backend_stubs_eetext-service-web if acl_stub_eetext-service-web
+    use_backend     backend_stubs_experian-pco-service-web if acl_stub_experian-pco-service-web
+    use_backend     backend_stubs_exttrigger-web if acl_stub_exttrigger-web
+    use_backend     backend_stubs_healthreport if acl_stub_healthreport
+    use_backend     backend_stubs_logon-services-web if acl_stub_logon-services-web
+    use_backend     backend_stubs_mobilesubscription if acl_stub_mobilesubscription
+    use_backend     backend_stubs_netlynks-services-web if acl_stub_netlynks-services-web
+    use_backend     backend_stubs_provisioning-services-web if acl_stub_provisioning-services-web
+    use_backend     backend_stubs_serverhealthcheck-web if acl_stub_serverhealthcheck-web
+    use_backend     backend_stubs_qube-service-web if acl_stub_qube-service-web
+    use_backend     backend_stubs_gpaacgroupdetail-web if acl_stub_gpaacgroupdetail-web
+    use_backend     backend_stubs_ngd-services-web if acl_stub_ngd-services-web
+    use_backend     backend_stubs_providentorder-service-web if acl_stub_providentorder-service-web
+    use_backend     backend_stubs_baas_msweb if acl_stub_baas-ms-web
+    use_backend     backend_stubs_baas_rbmaccessservice if acl_stub_baas-rbmaccessservice-web
+    log             127.0.0.1 local3 info
+	log-format       %f\ %ci\ [%T]\ %{+Q}r\ %ST\ %U\ %Tr
+
+    default_backend backend_default
+
+--------------------------------------------------------------------------------------------------------
+
+backend backend_cngw_commoncapability_61080
+    mode            http
+    balance         roundrobin
+    option          httpchk GET /commoncapabilityservice/CustomerService/v01?wsdl
+    server          cngw01 10.13.18.85:61080 check
+    server          cngw02 10.13.18.86:61080 check
+	
+backend backend_cngw_coreouk_61080
+    mode            http
+    balance         roundrobin
+    option          httpchk GET /coreoukmessagesservice/
+    server          cngw01 10.13.18.85:61080 check
+    server          cngw02 10.13.18.86:61080 check 
+	
+backend backend_cngw_corecommon_61080
+    mode            http
+    balance         roundrobin
+    option          httpchk GET /corecommonmessagesservice/
+	server          cngw01 10.13.18.85:61080 check
+    server          cngw02 10.13.18.86:61080 check 
+
+
+	
+	
+
+
 
