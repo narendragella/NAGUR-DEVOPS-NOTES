@@ -1,0 +1,270 @@
+B2bE2E certificate process
+###########################
+ 
+/usr/local/wlms2/apps/java/jdk-11.0.10+9/bin/keytool  -import -file b2bE2E.btwholesale.b2b.bt.com.cer -alias b2bE2E.btwholesale.b2b.bt.com -keystore jssecacerts -storepass changeit
+ 
+ 
+ 
+/usr/local/wlms2/apps/java/jdk-11.0.10+9/bin/keytool -delete -v -keystore jssecacerts -alias b2be2e.btwholesale.b2b.bt.com.cer -storepass changeit
+ 
+ 
+/usr/local/wlms2/apps/java/jdk-11.0.10+9/bin/keytool  -import -file b2bE2E.btwholesale.b2b.bt.com.cer -alias b2bE2E.btwholesale.b2b.bt.com.cer -keystore jssecacerts -storepass changeit
+
+
+/usr/local/wlms2/apps/java/jdk-11.0.10+9/bin/keytool -list -v -keystore jssecacerts | grep -i alias
+
+
+openssl x509 -in b2bE2E.btwholesale.b2b.bt.com.cer -text -noout
+
+
+Serial number: 7e231fcedb519225c7231be6fc661c3
+
+e1487c5566f980df6911a8a804db4a5
+
+
+clientcerts.jks --- internal
+jssecacerts  --- external
+
+
+
+b2be2e.btwholesale.b2b.bt.com.cer
+b2bE2E.btwholesale.b2b.bt.com
+
+======================================================================================================
+Housekeeping commands for K8s: on Master node
+ 
+Below command will remove "Terminating" pods in all namespaces:
+kubectl get pods --insecure-skip-tls-verify=true --all-namespaces | grep Terminating | while read namespace pod rest; do kubectl --insecure-skip-tls-verify=true delete pod $pod -n $namespace; done
+ 
+Below command will remove "ContainerStatusUnknown" pods in all namespaces:
+kubectl get pods --insecure-skip-tls-verify=true --all-namespaces | grep ContainerStatusUnknown | while read namespace pod rest; do kubectl --insecure-skip-tls-verify=true delete pod $pod -n $namespace --grace-period=0 --force; done
+ 
+Below command will remove "CrashLoopBackOff" pods in all namespaces:
+kubectl get pods --insecure-skip-tls-verify=true --all-namespaces | grep CrashLoopBackOff | while read namespace pod rest; do kubectl --insecure-skip-tls-verify=true delete pod $pod -n $namespace --grace-period=0 --force; done
+ 
+------------------------------------------------------------------------------------------------------------------------------
+microservices old logs delete on NFS node:
+find . -mtime +5 | grep -i 'qubeappointmentunsolicitedservice-.*-.*' | xargs rm -rf
+ 
+---------------------------------------------------------------------------------------------------------------------------------------
+On K8s Master node if you see the below issue follow the steps to resolve it.
+ 
+ISSUE:
+[root@blt12393059 kubernetes]# kubectl get ns
+error: You must be logged in to the server (Unauthorized)
+[root@blt12393059 kubernetes]#
+ 
+SOLUTION:
+We need to copy admin.conf into the /root/.kube/ path. Take a backup of the existing config file, then move admin.conf as config and set the correct permissions.
+ 
+PATH=$PATH:/etc/kubernetes
+echo $PATH
+locate .kube
+cd /root/.kube
+ls -lart
+cd /etc/kubernetes
+ls -lrth
+cp admin.conf /root/.kube/
+cd /root/.kube
+cp config config_11012024
+mv admin.conf config
+chmod 755 config
+ 
+------------------------------------------------------------------------------------------------------------------------------------------------
+To Patch the MASTER and WORKER nodes, follow the steps below:
+ 
+TO PATCH THE WORKER NODE:
+ 
+On Master:
+kubectl drain blp12393041 --ignore-daemonsets --delete-emptydir-data
+ 
+Patch the worker node and reboot.
+ 
+After reboot, on Master:
+kubectl get nodes
+kubectl uncordon blp12393041
+ 
+ 
+TO PATCH THE MASTER NODE:
+ 
+On Master (if you are patching the Primary Master Node or secondary nodes follow the same steps):
+ 
+kubectl drain blp12393067 --ignore-daemonsets --delete-emptydir-data
+ 
+Patch the Master node and reboot.
+ 
+After reboot on Master:
+kubectl get nodes
+kubectl uncordon blp12393067
+ 
+Post Checks for any node:
+kubectl get pods --all-namespaces --field-selector spec.nodeName=blp12393041
+ 
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+To update the K8s certificate::
+ 
+We need to follow below steps to renew production/A1/NonProd environment certificates. Follow the same in the future.
+ 
+On Primary Master node only::
+kubeadm certs check-expiration
+kubectl get pods -A
+ 
+cd /etc/kubernetes
+ls -lrth
+mkdir 06012025backup
+cp -pr *.conf 06012025backup/
+cp -pr pki/ 06012025backup/
+ 
+kubeadm certs renew all
+kubeadm certs check-expiration
+ 
+crictl pods
+lp 928c56aebcb41          # kube-apiserver-blp12393067 POD ID
+crictl rmp 928c56aebcb41
+ 
+crictl pods                         # Now "kube-apiserver" will show with new timestamp
+ 
+crictl stopp 83ece7f44e056 a620efda8b171 3296572307eb7   # controller-manager, scheduler, etcd POD IDs
+crictl rmp 83ece7f44e056 a620efda8b171 3296572307eb7
+ 
+crictl pods
+ 
+cd ~/.kube
+ls -lrth
+mv config config_06012025
+ls -lrth
+cp /etc/kubernetes/admin.conf config
+chmod 755 config
+ls -lrth
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+CERTIFICATE RENEWAL:
+
+http://www.b2b.btwholesale.bt.com.cer/
+
+B2B Production (www.b2b.btwholesale.bt.com) → 27th November 2025 (RENEWAL)
+
+Corvus servers  --  blp12393359 & blp12393360
+CMC Servers --- blp12393393, blp12393394 & blp12393395
+Actcomp Servers  --- blp12393219 & blp12393220
+
+Path : /var/tomcat/tomcat_61080/certs 
+
+Valid from: Tue Jan 07 00:00:00 GMT 2025 until: Tue Jan 06 23:59:59 GMT 2026
+
+Serial number: 7193462471f2bf9d9183a54b562e680
+7193462471f2bf9d9183a54b562e680
+7193462471f2bf9d9183a54b562e680
+
+--------List-------
+1.  /usr/local/wlms2/apps/java/jdk-11.0.10+9/bin/keytool -list -v -keystore jssecacerts -storepass changeit | grep -i alias
+ 
+  
+ /usr/local/wlms2/apps/java/jdk-11.0.10+9/bin/keytool -list -v -keystore jssecacerts -storepass changeit -alias www.b2b.btwholesale.bt.com.cer
+ 
+------Delete-------
+2. /usr/local/wlms2/apps/java/jdk-11.0.10+9/bin/keytool -delete -v -keystore jssecacerts -alias www.b2b.btwholesale.bt.com.cer -storepass changeit
+
+
+
+-----------------import--------
+3.  /usr/local/wlms2/apps/java/jdk-11.0.10+9/bin/keytool  -import -file www.b2b.btwholesale.bt.com.cer -alias www.b2b.btwholesale.bt.com.cer -keystore jssecacerts -storepass changeit
+
+
+
+
+--------------------------------------------------------------------------------
+K8S patching
+
+
+first patch worker node then master node
+ 
+To PATCH THE WORKER NODE::-
+ 
+On Master:
+ 
+kubectl drain blp12393038 --ignore-daemonsets --delete-emptydir-data
+ 
+ pod distributuion budget ----ctrl+ccccc
+patch the worker node and reboot.
+
+On Master node:
+ 
+kubectl get nodes
+ 
+kubectl uncordon blp12393038
+ 
+kubectl get pods --all-namespaces --field-selector spec.nodeName=blp12393520
+ 
+[root@blp12393037 pc990121]# kubectl get nodes
+NAME          STATUS   ROLES           AGE    VERSION
+blp12393037   Ready    control-plane   265d   v1.24.2
+blp12393038   Ready    control-plane   265d   v1.24.2
+blp12393040   Ready    <none>          265d   v1.24.2
+blp12393041   Ready    <none>          265d   v1.24.2
+blp12393067   Ready    control-plane   265d   v1.24.2
+blp12393520   Ready    <none>          265d   v1.24.2
+
+
+curl -Ls patch.linux.nat.bt.com/onepatch | bash
+
+
+--------------------------------------------------------------------
+##########b2b.btretail.bt.com#############
+Contact Detail (Surendra) Surendra Kumar Nagarapu QQJE C surendrakumar.nagarapu@bt.com
+ 
+Server details:
+Corvus:
+blp12393359
+blp12393360
+ 
+Cerificates Path(import)
+/var/tomcat/tomcat_61080/certs
+ 
+1./usr/local/wlms2/apps/java/jdk-11.0.10+9/bin/keytool -delete -v -keystore jssecacerts -alias b2b.btretail.bt.com -storepass changeit
+ 
+2. /usr/local/wlms2/apps/java/jdk-11.0.10+9/bin/keytool  -import -file b2bretail.cer -alias b2b.btretail.bt.com -keystore jssecacerts
+ 
+3./usr/local/wlms2/apps/java/jdk-11.0.10+9/bin/keytool -v -list  -keystore jssecacerts -alias b2b.btretail.bt.com
+ 
+ 
+As part of the certificate change , need to update the certificate in b2bretail/openreach & WLMS corvus app & Corvus DB (schema update in table).
+Sanjive had provided query with DIVI Narendra to update the new certificate against table.
+
+ 
+Note : Certificate needs to update at openreach/b2bretail & WLMS2 corvus servers
+---------------------------------------------------------------
+
+S4, C3, C5, A1
+
+S4 --- HAProxy changes
+C3, C5 ---HAProxy changes, VTM(changed the port no- )
+C5 changes in VTM
+virtual server
+
+BEFORE
+VS-C5_ISCORE_COREOUK (HTTP, port 8091)
+VS-C5_ISCORE_CORECMS (HTTP, port 8090)
+ --> Before the changes the port is 8091 and 8090 as the properties in isgw(vi /etc/hqn/cmspci/cmspci.properties) is changed to 8080. i have changed the VTM port to 8080 frontend 
+
+AFTER
+VS-C5_ISCORE_CORECMS port is changed to 8080 from 8090 
+VS-C5_ISCORE_COREOUK port is changed to 8080 from 8091
+
+as for c5,A1 PORT is same for both COREOUK & CORECMS which is 8080, so only 1 virtual sever is enough as ports as same.
+
+A1-- ONLY VTM changes are required but VTM changes alone are not working. it is working along with both VTM &HAProxy changes.
+
+Before
+VS-A1_ISCORE_COREOUK (HTTP, port 8091)
+
+AFTER
+VS-A1_CNGW_COREOUK (HTTP, port 8080)
+No need of changing both the virtual servers, one is enough as port is same.
+
+prod
+
+create pool, and then virtual server as same as A1(VS-A1_CNGW_COREOUK (HTTP, port 8080))
+
+
+
